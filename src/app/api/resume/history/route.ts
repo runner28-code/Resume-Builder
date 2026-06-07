@@ -12,8 +12,10 @@ export async function GET(req: NextRequest) {
   }
 
   const { searchParams } = new URL(req.url);
-  const limit = Math.min(parseInt(searchParams.get("limit") ?? String(DEFAULT_LIMIT), 10), MAX_LIMIT);
-  const offset = Math.max(parseInt(searchParams.get("offset") ?? "0", 10), 0);
+  const rawLimit = parseInt(searchParams.get("limit") ?? "", 10);
+  const limit = Number.isFinite(rawLimit) ? Math.min(Math.max(rawLimit, 1), MAX_LIMIT) : DEFAULT_LIMIT;
+  const rawOffset = parseInt(searchParams.get("offset") ?? "", 10);
+  const offset = Number.isFinite(rawOffset) ? Math.max(rawOffset, 0) : 0;
   const q = (searchParams.get("q") ?? "").trim();
 
   try {

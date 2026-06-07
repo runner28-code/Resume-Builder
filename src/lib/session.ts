@@ -69,7 +69,9 @@ export async function encrypt(payload: SessionPayload): Promise<string> {
 export async function decrypt(token: string): Promise<SessionPayload | null> {
   try {
     const { payload } = await jwtVerify(token, secretKey(), { algorithms: ["HS256"] });
-    return payload as unknown as SessionPayload;
+    const { userId, email } = payload as Record<string, unknown>;
+    if (typeof userId !== "string" || !userId || typeof email !== "string" || !email) return null;
+    return { userId, email };
   } catch {
     return null;
   }
@@ -81,7 +83,7 @@ export async function createSession(userId: string, email: string): Promise<void
   const store = await cookies();
   store.set(COOKIE, token, {
     httpOnly: true,
-    secure: process.env.NEXT_PUBLIC_APP_URL?.startsWith("https://") ?? false,
+    secure: process.env.NODE_ENV === "production" || (process.env.NEXT_PUBLIC_APP_URL?.startsWith("https://") ?? false),
     expires,
     sameSite: "lax",
     path: "/",

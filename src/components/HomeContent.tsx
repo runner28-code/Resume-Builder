@@ -7,7 +7,7 @@ import { ResumeHistory } from "@/components/ResumeHistory";
 import { useResumeStore } from "@/store/resume-store";
 import { logout } from "@/app/actions/auth";
 
-export function HomeContent({ userEmail }: { userEmail: string }) {
+export function HomeContent({ userId, userEmail }: { userId: string; userEmail: string }) {
   const { jobs, runAll, resetJobs } = useResumeStore();
   const [tab, setTab] = useState<"generate" | "history">("generate");
   const [expandedJob, setExpandedJob] = useState<string | null>(null);
@@ -212,7 +212,7 @@ export function HomeContent({ userEmail }: { userEmail: string }) {
         {tab === "history" && (
           <div className="max-w-2xl mx-auto">
             <h2 className="text-lg font-semibold mb-4">Your Resumes</h2>
-            <ResumeHistory />
+            <ResumeHistory userId={userId} />
           </div>
         )}
 

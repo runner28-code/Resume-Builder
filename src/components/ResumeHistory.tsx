@@ -95,7 +95,7 @@ function ViewModal({ item, onClose }: { item: HistoryItem; onClose: () => void }
 
 // ── Component ──────────────────────────────────────────────────────────────
 
-export function ResumeHistory() {
+export function ResumeHistory({ userId }: { userId: string }) {
   const [items, setItems]           = useState<HistoryItem[]>([]);
   const [hasMore, setHasMore]       = useState(false);
   const [loading, setLoading]       = useState(true);
@@ -115,7 +115,7 @@ export function ResumeHistory() {
   }
 
   useEffect(() => {
-    const cached = getHistoryCache<HistoryItem>();
+    const cached = getHistoryCache<HistoryItem>(userId);
     if (cached && !search.trim()) {
       setItems(cached.items);
       setHasMore(cached.hasMore);
@@ -128,7 +128,7 @@ export function ResumeHistory() {
       .then((data) => {
         const fetched: HistoryItem[] = data.resumes ?? [];
         const more: boolean = data.hasMore ?? false;
-        if (!search.trim()) setHistoryCache(fetched, more);
+        if (!search.trim()) setHistoryCache(userId, fetched, more);
         setItems(fetched);
         setHasMore(more);
         setLoading(false);
@@ -151,7 +151,7 @@ export function ResumeHistory() {
       const moreAvail: boolean = data.hasMore ?? false;
       setItems(updated);
       setHasMore(moreAvail);
-      if (!search.trim()) setHistoryCache(updated, moreAvail);
+      if (!search.trim()) setHistoryCache(userId, updated, moreAvail);
     } catch (e) {
       setFetchError(String(e));
     } finally {
@@ -197,7 +197,7 @@ export function ResumeHistory() {
       if (!res.ok) throw new Error(await res.text());
       const updated = items.filter((i) => i.id !== item.id);
       setItems(updated);
-      invalidateHistoryCache();
+      invalidateHistoryCache(userId);
     } catch (e) {
       setActionError(`Delete failed: ${String(e)}`);
     } finally {

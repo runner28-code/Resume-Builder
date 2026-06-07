@@ -25,6 +25,8 @@ export async function findSimilarResumes(
   currentUserId?: string | null,
   precomputedEmbedding?: number[]
 ): Promise<{ results: SearchResult[]; voyageCost: number }> {
+  if (!currentUserId) return { results: [], voyageCost: 0 };
+
   const embeddingWasFree = !!(precomputedEmbedding && precomputedEmbedding.length > 0);
   const newEmbedding = embeddingWasFree
     ? precomputedEmbedding!
@@ -56,7 +58,7 @@ export async function findSimilarResumes(
       "companiesJson"::text
     FROM "Resume"
     WHERE "jdEmbedding" IS NOT NULL
-    AND "userId" = ${currentUserId ?? ""}
+    AND "userId" = ${currentUserId}
     ORDER BY "jdEmbedding" <=> ${JSON.stringify(newEmbedding)}::vector
     LIMIT ${topK * 3}
   `;

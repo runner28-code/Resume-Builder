@@ -1,0 +1,38 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+}
+
+// Run migrations in Supabase SQL editor — see prisma/migrations/ for scripts.
+model User {
+  id           String   @id
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  resumes      Resume[]
+}
+
+model Resume {
+  id                 String                      @id @default(cuid())
+  userId             String
+  user               User                        @relation(fields: [userId], references: [id])
+  sessionId          String
+  candidateName      String
+  jdText             String                      @db.Text
+  jdEmbedding        Unsupported("vector(512)")?
+  jdKeywords         String[]
+  jdIndustry         String?
+  companiesJson      Json
+  teamSelectionsJson Json
+  teamResearchKeys   String[]
+  resumeContent      Json
+  bulletsByRole      Json
+  createdAt          DateTime                    @default(now())
+
+  @@index([userId])
+  @@index([jdIndustry])
+  @@index([sessionId])
+}
